@@ -1,15 +1,13 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const userroute = require("./app/controller/create");
-const creatUser = require("./app/controller/alluser");
+const routes = require("./app/routes")
 
 const app = express();
 app.use(express.json());
 
 const port = 4000;
 
-app.use("/api", userroute);
-app.use("/api", creatUser);
+app.use("/api", routes);
 
 mongoose
   .connect(
