@@ -6,11 +6,10 @@ const {
   loginUser,
 } = require("./controller/userController");
 
-const auth = require("../Helper/auth")
 
 const router = express.Router();
 
-router.route("/alluser").get(auth.validate,getUser);
+router.route("/alluser").get(getUser);
 router.route("/signup").post(signupUser);
 router.route("/signin").post(loginUser);
 
