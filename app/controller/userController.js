@@ -2,6 +2,10 @@ const User = require("../modal/userModel");
 const userService = require("../services/userServices");
 const bycrypt = require("bcrypt");
 const saltRounds = 10;
+const jwt = require("jsonwebtoken");
+const JWT = require("../../Helper/jwt")
+
+
 
 const userController = {
   getUser: async function (req, res) {
@@ -60,7 +64,6 @@ const userController = {
   },
   loginUser: async function (req, res) {
     const { email, password } = req.body;
-    console.log(email, password);
     let response = {};
     try {
       if (!email || !password){
@@ -76,14 +79,23 @@ const userController = {
       let isPasswordMatch = bycrypt.compareSync(password, savePassword);
 
       if (!isPasswordMatch) throw new Error("wrong email or password");
+      
+      // creating Token
+      const token = await  JWT(user)
+      if(!token){
+        throw new Error("no token could be Genreted")
+      }
       response = {
         success: 1,
-        message: "logged in successfully",
+        loggedIn: 1,
+        token: token,
+        user:user,
       };
     } catch (error) {
       response = {
         success: 0,
-        message:`${error.message}`,
+        loggedIn: 0,
+        message: `${error.message}`,
       };
       console.log(error);
     }
