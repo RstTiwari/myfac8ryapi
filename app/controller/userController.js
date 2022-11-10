@@ -1,6 +1,7 @@
 const User = require("../modal/userModel");
 const userService = require("../services/userServices");
 const bycrypt = require("bcrypt");
+const JWT = require("../../Helper/Jwt")
 const saltRounds = 10;
 
 const userController = {
@@ -60,7 +61,6 @@ const userController = {
   },
   loginUser: async function (req, res) {
     const { email, password } = req.body;
-    console.log(email, password);
     let response = {};
     try {
       if (!email || !password){
@@ -76,9 +76,13 @@ const userController = {
       let isPasswordMatch = bycrypt.compareSync(password, savePassword);
 
       if (!isPasswordMatch) throw new Error("wrong email or password");
+      let token = await JWT(user)
       response = {
         success: 1,
         message: "logged in successfully",
+        token:token,
+        user:user
+
       };
     } catch (error) {
       response = {
