@@ -3,6 +3,10 @@ const userService = require("../services/userServices");
 const bycrypt = require("bcrypt");
 const JWT = require("../../Helper/Jwt")
 const saltRounds = 10;
+const jwt = require("jsonwebtoken");
+const JWT = require("../../Helper/jwt")
+
+
 
 const userController = {
   getUser: async function (req, res) {
@@ -83,11 +87,13 @@ const userController = {
         token:token,
         user:user
 
+
       };
     } catch (error) {
       response = {
         success: 0,
-        message:`${error.message}`,
+        loggedIn: 0,
+        message: `${error.message}`,
       };
       console.log(error);
     }
