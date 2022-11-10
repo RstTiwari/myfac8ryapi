@@ -78,7 +78,7 @@ const userController = {
       let isPasswordMatch = bycrypt.compareSync(password, savePassword);
 
       if (!isPasswordMatch) throw new Error("wrong email or password");
-      let token = await JWT(user)
+      let token =  JWT(user)
       response = {
         success: 1,
         message: "logged in successfully",
