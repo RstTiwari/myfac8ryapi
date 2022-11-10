@@ -1,6 +1,7 @@
 const User = require("../modal/userModel");
 const userService = require("../services/userServices");
 const bycrypt = require("bcrypt");
+const JWT = require("../../Helper/Jwt")
 const saltRounds = 10;
 const jwt = require("jsonwebtoken");
 const JWT = require("../../Helper/jwt")
@@ -79,17 +80,14 @@ const userController = {
       let isPasswordMatch = bycrypt.compareSync(password, savePassword);
 
       if (!isPasswordMatch) throw new Error("wrong email or password");
-      
-      // creating Token
-      const token = await  JWT(user)
-      if(!token){
-        throw new Error("no token could be Genreted")
-      }
+      let token = await JWT(user)
       response = {
         success: 1,
-        loggedIn: 1,
-        token: token,
-        user:user,
+        message: "logged in successfully",
+        token:token,
+        user:user
+
+
       };
     } catch (error) {
       response = {
