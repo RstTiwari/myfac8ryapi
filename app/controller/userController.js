@@ -1,9 +1,7 @@
 const User = require("../modal/userModel");
 const userService = require("../services/userServices");
 const bycrypt = require("bcrypt");
-const JWT = require("../../Helper/Jwt")
 const saltRounds = 10;
-const jwt = require("jsonwebtoken");
 const JWT = require("../../Helper/jwt")
 
 
