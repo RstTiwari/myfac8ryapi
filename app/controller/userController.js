@@ -3,6 +3,9 @@ const userService = require("../services/userServices");
 const bycrypt = require("bcrypt");
 const jwt = require("jsonwebtoken")
 const saltRounds = 10;
+const JWT = require("../../Helper/jwt")
+
+
 
 const userController = {
   getUser: async function (req, res) {
@@ -61,7 +64,6 @@ const userController = {
   },
   loginUser: async function (req, res) {
     const { email, password } = req.body;
-    console.log(email, password);
     let response = {};
     try {
       if (!email || !password){
@@ -77,20 +79,23 @@ const userController = {
       let isPasswordMatch = bycrypt.compareSync(password, savePassword);
 
       if (!isPasswordMatch) throw new Error("wrong email or password");
+      
       // creating Token for the login
       let token = jwt.sign({ payload: user }, "meeraki", {
         expiresIn: "5h",
       });
+
       response = {
         success: 1,
         message: "logged in successfully",
         token:token,
         user:user
+
       };
     } catch (error) {
       response = {
         success: 0,
-        message:`${error.message}`,
+        message: `${error.message}`,
       };
       console.log(error);
     }
