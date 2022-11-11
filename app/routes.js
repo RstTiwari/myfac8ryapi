@@ -4,7 +4,7 @@ const router = express.Router();
 
 
 
-router.route("/alluser").get(getUser)
+router.route("/allusers").get(getUser)
 router.route("/signup").post(signupUser);
 router.route("/signin").post(loginUser)
 
