@@ -1,6 +1,7 @@
 const User = require("../modal/userModel");
 const userService = require("../services/userServices");
 const bycrypt = require("bcrypt");
+const jwt = require("jsonwebtoken")
 const saltRounds = 10;
 
 const userController = {
@@ -76,9 +77,15 @@ const userController = {
       let isPasswordMatch = bycrypt.compareSync(password, savePassword);
 
       if (!isPasswordMatch) throw new Error("wrong email or password");
+      // creating Token for the login
+      let token = jwt.sign({ payload: user }, "meeraki", {
+        expiresIn: "5h",
+      });
       response = {
         success: 1,
         message: "logged in successfully",
+        token:token,
+        user:user
       };
     } catch (error) {
       response = {
