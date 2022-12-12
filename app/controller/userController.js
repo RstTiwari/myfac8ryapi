@@ -1,11 +1,14 @@
 
-const bycrypt = require("bcrypt");
 const nodeMailer = require("nodemailer");
 const jwt = require("jsonwebtoken")
 const fs = require("fs");
 const saltRounds = 10;
 const User = require("../modal/userModel");
 const userService = require("../services/userServices");
+const bycrypt = require("bcrypt");
+const JWT = require("../../Helper/jwt")
+
+
 
 const userController = {
   getUser: async function (req, res) {
@@ -64,7 +67,6 @@ const userController = {
   },
   loginUser: async function (req, res) {
     const { email, password } = req.body;
-    console.log(email, password);
     let response = {};
     try {
       if (!email || !password) {
@@ -80,15 +82,18 @@ const userController = {
       let isPasswordMatch = bycrypt.compareSync(password, savePassword);
 
       if (!isPasswordMatch) throw new Error("wrong email or password");
+      
       // creating Token for the login
       let token = jwt.sign({ payload: user }, "meeraki", {
         expiresIn: "5h",
       });
+
       response = {
         success: 1,
         message: "logged in successfully",
         token: token,
         user: user,
+
       };
     } catch (error) {
       response = {
@@ -102,7 +107,6 @@ const userController = {
   sendFile: async function (req, res) {
        try {
       // number defined for setting enquiryId
-      let enquiryId = helper.getNumber("enquiryId");
       let fileName = req.file.originalname;
 
       // now saving the data on db
