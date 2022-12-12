@@ -6,7 +6,6 @@ const fs = require("fs");
 const saltRounds = 10;
 const User = require("../modal/userModel");
 const userService = require("../services/userServices");
-const helper = require("../helper/numberFun")
 
 const userController = {
   getUser: async function (req, res) {
@@ -108,8 +107,7 @@ const userController = {
 
       // now saving the data on db
       let obj = {
-        enquiryId: enquiryId,
-        fileName: `${enquiryId}${fileName}`,
+        fileName: `${fileName}`,
       };
       let enquiryData = await userService.enquiryFile(obj);
 
