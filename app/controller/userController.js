@@ -1,8 +1,12 @@
+
+const bycrypt = require("bcrypt");
+const nodeMailer = require("nodemailer");
+const jwt = require("jsonwebtoken")
+const fs = require("fs");
+const saltRounds = 10;
 const User = require("../modal/userModel");
 const userService = require("../services/userServices");
-const bycrypt = require("bcrypt");
-const jwt = require("jsonwebtoken")
-const saltRounds = 10;
+const helper = require("../helper/numberFun")
 
 const userController = {
   getUser: async function (req, res) {
@@ -64,7 +68,7 @@ const userController = {
     console.log(email, password);
     let response = {};
     try {
-      if (!email || !password){
+      if (!email || !password) {
         throw new Error("Pls provide all details for login");
       }
       let filter = { email };
@@ -84,17 +88,42 @@ const userController = {
       response = {
         success: 1,
         message: "logged in successfully",
-        token:token,
-        user:user
+        token: token,
+        user: user,
       };
     } catch (error) {
       response = {
         success: 0,
-        message:`${error.message}`,
+        message: `${error.message}`,
       };
       console.log(error);
     }
     res.send(response);
+  },
+  sendFile: async function (req, res) {
+       try {
+      // number defined for setting enquiryId
+      let enquiryId = helper.getNumber("enquiryId");
+      let fileName = req.file.originalname;
+
+      // now saving the data on db
+      let obj = {
+        enquiryId: enquiryId,
+        fileName: `${enquiryId}${fileName}`,
+      };
+      let enquiryData = await userService.enquiryFile(obj);
+
+      res.send({
+        status: 1,
+        message: "File created successfully!!",
+      });
+    } catch (error) {
+      console.log("Error in parsing file", error);
+      return res.send({
+        status: 0,
+        message: "There was an error parsing the files",
+      });
+    }
   },
 };
 
