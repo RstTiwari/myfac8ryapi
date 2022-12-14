@@ -131,8 +131,7 @@ const userController = {
         port: 465,
         secure: true,
         auth: {
-          user: "iamrrt2121@gmail.com",
-          pass: "topgpznsvrqcuwir",
+
         },
       });
 
