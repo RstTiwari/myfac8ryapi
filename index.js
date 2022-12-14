@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors")
 const routes = require("./app/routes")
+const multer = require("multer")
 
 const app = express();
 app.use(express.json());
