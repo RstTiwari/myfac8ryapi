@@ -1,5 +1,4 @@
 const express = require("express")
-const {getUser ,signupUser ,loginUser,sendFile} = require("./controller/userController")
 const router = express.Router();
 const multer = require("multer");
 
@@ -7,6 +6,7 @@ const {
   getUser,
   signupUser,
   loginUser,
+  sendFile,
 } = require("./controller/userController");
 
 
