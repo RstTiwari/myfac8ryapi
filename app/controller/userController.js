@@ -3,10 +3,11 @@ const nodeMailer = require("nodemailer");
 const jwt = require("jsonwebtoken")
 const fs = require("fs");
 const saltRounds = 10;
+
 const User = require("../modal/userModel");
 const userService = require("../services/userServices");
 const bycrypt = require("bcrypt");
-const JWT = require("../../Helper/jwt")
+const helper = require("../helper/numberFun")
 
 
 
@@ -106,19 +107,54 @@ const userController = {
   },
   sendFile: async function (req, res) {
        try {
+
       // number defined for setting enquiryId
+      let counterData = await userService.getCounter("enquiry")
       let fileName = req.file.originalname;
 
       // now saving the data on db
+      // checking if file is alredy there
+      let existingFile = await userService.getExistingFile(fileName);
+
+      if(existingFile.length > 0){
+        throw new Error("File alredy submitted")
+      }
       let obj = {
+        enquiryId: counterData.counterSeq,
         fileName: `${fileName}`,
       };
       let enquiryData = await userService.enquiryFile(obj);
-
-      res.send({
-        status: 1,
-        message: "File created successfully!!",
+      if (enquiryData.length < 1) throw new Error("File could not be saved")
+      // sending us mail of enquiry
+      let tranporter = nodeMailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: {
+          user: "iamrrt2121@gmail.com",
+          pass: "topgpznsvrqcuwir",
+        },
       });
+
+      let info = await tranporter.sendMail({
+        from: "iamrrt2121@gmail.com",
+        to: "iamrst17@gmail.com",
+        subject: "EnquiryMail",
+        text: "Recived an enquiry mail",
+        attachments: [
+          {
+            path: `enquiry/${fileName}`,
+          },
+        ],
+      });
+      if(info.errno){
+        throw new Error("Failed to send email")
+      }
+
+        res.send({
+          status: 1,
+          message: "Enquiry created Succesfull !!",
+        });
     } catch (error) {
       console.log("Error in parsing file", error);
       return res.send({

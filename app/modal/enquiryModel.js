@@ -8,6 +8,10 @@ const enquirySchema = mongoose.Schema({
         type:String,
         require:true,
     }
+    ,createdAt:{
+        type:Number,
+        default:parseInt(Date.now()/100)
+    }
  
 });
 
