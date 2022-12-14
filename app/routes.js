@@ -3,7 +3,11 @@ const {getUser ,signupUser ,loginUser,sendFile} = require("./controller/userCont
 const router = express.Router();
 const multer = require("multer");
 
-
+const {
+  getUser,
+  signupUser,
+  loginUser,
+} = require("./controller/userController");
 
 
 const storage = multer.diskStorage({
@@ -17,10 +21,13 @@ const storage = multer.diskStorage({
 
 const upload = multer({storage:storage})
 
+
+
 router.route("/allusers").get(getUser)
 router.route("/signup").post(signupUser);
 router.route("/signin").post(loginUser)
 router.route("/sendfile").post(upload.single("enquiryFile"), sendFile);
 
 
-module.exports = router
+
+module.exports = router;
