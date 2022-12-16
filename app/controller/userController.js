@@ -131,12 +131,14 @@ const userController = {
         port: 465,
         secure: true,
         auth: {
+          user:"info.myfac8ry@gmail.com",
+          pass:"####Myfac8ry2121####"
 
         },
       });
 
       let info = await tranporter.sendMail({
-        from: "iamrrt2121@gmail.com",
+        from: "info.myfac8ry@gmail.com",
         to: "iamrst17@gmail.com",
         subject: "EnquiryMail",
         text: "Recived an enquiry mail",
