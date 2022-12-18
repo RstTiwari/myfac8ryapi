@@ -132,19 +132,19 @@ const userController = {
         secure: true,
         auth: {
           user:"info.myfac8ry@gmail.com",
-          pass:"####Myfac8ry2121####"
+          pass:"qanbmwhykokzjxut"
 
         },
       });
 
       let info = await tranporter.sendMail({
         from: "info.myfac8ry@gmail.com",
-        to: "iamrst17@gmail.com",
-        subject: "EnquiryMail",
+        to: "info.myfac8ry@gmail.com",
+        subject: " myfac8ry enquiry  Mail",
         text: "Recived an enquiry mail",
         attachments: [
           {
-            path: `enquiry/${fileName}`,
+            path: `enquiry/${fileName}`, 
           },
         ],
       });
@@ -165,5 +165,4 @@ const userController = {
     }
   },
 };
-
 module.exports = userController;
