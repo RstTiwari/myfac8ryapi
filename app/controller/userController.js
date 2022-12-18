@@ -117,12 +117,7 @@ const userController = {
       let fileName = `${counterData.counterSeq}/${req.file.originalname}`;
 
       // now saving the data on db
-      // checking if file is alredy there
-      let existingFile = await userService.getExistingFile(fileName);
 
-      if(existingFile.length > 0){
-        throw new Error("File alredy submitted")
-      }
       let obj = {
         enquiryId: counterData.counterSeq,
         fileName: fileName,
