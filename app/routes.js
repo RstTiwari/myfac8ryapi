@@ -7,6 +7,7 @@ const {
   signupUser,
   loginUser,
   sendFile,
+  elastic
 } = require("./controller/userController");
 
 
@@ -31,6 +32,7 @@ router.route("/allusers").get(getUser)
 router.route("/signup").post(signupUser);
 router.route("/signin").post(loginUser)
 router.route("/sendfile").post(upload.single("enquiryFile"), sendFile);
+router.route("/elastic").post(elastic);
 
 
 

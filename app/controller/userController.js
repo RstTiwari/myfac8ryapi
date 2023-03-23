@@ -8,17 +8,14 @@ const User = require("../modal/userModel");
 const userService = require("../services/userServices");
 const bycrypt = require("bcrypt");
 const  { google } = require("googleapis") 
+const { Client } = require("@elastic/elasticsearch");
 
 
 
 const userController = {
   getUser: async function (req, res) {
     let data = await User.find();
-    let response = {
-      success: 1,
-      message: data,
-    };
-    res.send(response);
+    return data
   },
   signupUser: async function (req, res) {
     const { companyName, name, email, number, password } = req.body;
@@ -83,7 +80,7 @@ const userController = {
       let isPasswordMatch = bycrypt.compareSync(password, savePassword);
 
       if (!isPasswordMatch) throw new Error("wrong email or password");
-      
+
       // creating Token for the login
       let token = jwt.sign({ payload: user }, "meeraki", {
         expiresIn: "5h",
@@ -94,7 +91,6 @@ const userController = {
         message: "logged in successfully",
         token: token,
         user: user,
-
       };
     } catch (error) {
       response = {
@@ -106,14 +102,14 @@ const userController = {
     res.send(response);
   },
   sendFile: async function (req, res) {
-       try {
-        if (!req.file) {
-          res.status(400).send("No file uploaded.");
-          return;
-        }
+    try {
+      if (!req.file) {
+        res.status(400).send("No file uploaded.");
+        return;
+      }
 
       // number defined for setting enquiryId
-      let counterData = await userService.getCounter("enquiry")
+      let counterData = await userService.getCounter("enquiry");
       let fileName = `${counterData.counterSeq}/${req.file.originalname}`;
 
       // now saving the data on db
@@ -121,25 +117,28 @@ const userController = {
       let obj = {
         enquiryId: counterData.counterSeq,
         fileName: fileName,
-      }
+      };
 
       const auth = userController.authenticateGoogle();
-      const response = await userController.uploadToGoogleDrive(req.file,fileName, auth);
-      if(response.success = 200){
+      const response = await userController.uploadToGoogleDrive(
+        req.file,
+        fileName,
+        auth
+      );
+      if ((response.success = 200)) {
         let enquiryData = await userService.enquiryFile(obj);
-        if (enquiryData.length < 1) throw new Error("File could not be saved")
+        if (enquiryData.length < 1) throw new Error("File could not be saved");
         // sending us mail of enquiry
         let tranporter = nodeMailer.createTransport({
           host: "smtp.gmail.com",
           port: 465,
           secure: true,
           auth: {
-            user:"info.myfac8ry@gmail.com",
-            pass:"qanbmwhykokzjxut"
-  
+            user: "info.myfac8ry@gmail.com",
+            pass: "qanbmwhykokzjxut",
           },
         });
-  
+
         let info = await tranporter.sendMail({
           from: "info.myfac8ry@gmail.com",
           to: "info.myfac8ry@gmail.com",
@@ -147,22 +146,23 @@ const userController = {
           text: "Recived an enquiry mail",
           attachments: [
             {
-              path:req.file.path, 
+              path: req.file.path,
             },
           ],
         });
-        if(info.response = "250 2.0.0 OK  1671384732 c12-20020a170903234c00b0017ec1b1bf9fsm5325160plh.217 - gsmtp"){
+        if (
+          (info.response =
+            "250 2.0.0 OK  1671384732 c12-20020a170903234c00b0017ec1b1bf9fsm5325160plh.217 - gsmtp")
+        ) {
           res.send({
             success: 1,
             message: "Enquiry created Succesfull !!",
           });
         }
-        
 
         userController.deleteFile(req.file.path);
-
-      }else{
-        throw "File could not be uploaded"
+      } else {
+        throw "File could not be uploaded";
       }
     } catch (error) {
       console.log("Error in parsing file", error);
@@ -172,26 +172,26 @@ const userController = {
       });
     }
   },
-   authenticateGoogle :() => {
+  authenticateGoogle: () => {
     const auth = new google.auth.GoogleAuth({
       keyFile: `/home/rstpersonal/myfac8ry/myfac8ryapi/myfac8ry.json`,
       scopes: "https://www.googleapis.com/auth/drive",
     });
     return auth;
   },
-  uploadToGoogleDrive : async (file,fileName, auth) => {
+  uploadToGoogleDrive: async (file, fileName, auth) => {
     const fileMetadata = {
       name: fileName,
       parents: ["11TrC4SBNy62qxd0wTDGxHr8391e9isHU"], // Change it according to your desired parent folder id
     };
-  
+
     const media = {
       mimeType: file.mimetype,
       body: fs.createReadStream(file.path),
     };
-  
+
     const driveService = google.drive({ version: "v3", auth });
-  
+
     const response = await driveService.files.create({
       requestBody: fileMetadata,
       media: media,
@@ -199,11 +199,39 @@ const userController = {
     });
     return response;
   },
-  deleteFile:(filePath) => {
+  deleteFile: (filePath) => {
     fs.unlink(filePath, () => {
       console.log("file deleted");
     });
+  },
+  elastic: async function(req, res){
+    const client = new Client({
+      node: "http://localhost:9200",
+    });
+
+    let data = await userController.getUser();
+    for(let i = 0 ; i < data.length ; i++){
+        await client.index({
+          index: "users",
+          document: {
+            ...data
+          },
+        });
+
+    }
+
+      // Let's search!
+  const result = await client.search({
+    index: "users",
+    query: {
+      match_all: {},
+    }
+  });
+
+  res.send(result)
+
+}
+
   }
 
-};
 module.exports = userController;
