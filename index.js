@@ -1,6 +1,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const dotenv = require("dotenv")
 const cors = require("cors")
+
+dotenv.config()
 const routes = require("./app/routes")
 
 const app = express();
@@ -13,7 +16,7 @@ app.use("/api", routes);
 
 mongoose
   .connect(
-    "mongodb://myfac8ry:myfac8ry@ac-z992smf-shard-00-00.fmmrhks.mongodb.net:27017,ac-z992smf-shard-00-01.fmmrhks.mongodb.net:27017,ac-z992smf-shard-00-02.fmmrhks.mongodb.net:27017/?ssl=true&replicaSet=atlas-piyukq-shard-0&authSource=admin&retryWrites=true&w=majority",
+    process.env.MDURL,
     { useNewUrlParser: true, useUnifiedTopology: true }
   )
   .then(() =>

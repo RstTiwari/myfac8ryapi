@@ -13,6 +13,7 @@ const userController = {
     };
     res.send(response);
   },
+
   signupUser: async function (req, res) {
     const { companyName, name, email, number, password } = req.body;
     let response = {};
@@ -35,12 +36,15 @@ const userController = {
       // creating userId
 
       // creating user Object
+      
+      let today = parseInt(Date.now()/1000)
       let user = {
         companyName: companyName,
         name: name,
         email: email,
         number: number,
         password: hashPassword,
+        createdAt:today
       };
       let newUser = await userService.signup(user);
       if (!newUser) {
@@ -59,12 +63,13 @@ const userController = {
     }
     res.send(response);
   },
+
   loginUser: async function (req, res) {
     const { email, password } = req.body;
     console.log(email, password);
     let response = {};
     try {
-      if (!email || !password){
+      if (!email || !password) {
         throw new Error("Pls provide all details for login");
       }
       let filter = { email };
@@ -84,16 +89,17 @@ const userController = {
       response = {
         success: 1,
         message: "logged in successfully",
-        token:token,
-        user:user
+        token: token,
+        user: user,
       };
     } catch (error) {
       response = {
         success: 0,
-        message:`${error.message}`,
+        message: `${error.message}`,
       };
       console.log(error);
     }
+    console.log(response);
     res.send(response);
   },
 };
