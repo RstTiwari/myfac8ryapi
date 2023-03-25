@@ -1,7 +1,9 @@
 const User = require("../modal/userModel");
 const userService = require("../services/userServices");
 const bycrypt = require("bcrypt");
-const jwt = require("jsonwebtoken")
+const nodemailer = require("nodemailer")
+const jwt = require("jsonwebtoken");
+const  fs  = require("fs");
 const saltRounds = 10;
 
 const userController = {
@@ -36,15 +38,15 @@ const userController = {
       // creating userId
 
       // creating user Object
-      
-      let today = parseInt(Date.now()/1000)
+
+      let today = parseInt(Date.now() / 1000);
       let user = {
         companyName: companyName,
         name: name,
         email: email,
         number: number,
         password: hashPassword,
-        createdAt:today
+        createdAt: today,
       };
       let newUser = await userService.signup(user);
       if (!newUser) {
@@ -101,6 +103,79 @@ const userController = {
     }
     console.log(response);
     res.send(response);
+  },
+
+  userEqnquiry: async function (req, res) {
+    try {
+
+      const { userid } = req.headers;
+      Number(userid);
+
+      if (!req.file) {
+        throw new Error("No attached File Find");
+      }
+
+      if (!userid || userid < -1) {
+        throw new Error("please Provide valid useId");
+      }
+
+      let enquiryNo = parseInt(Date.now()/1000)
+
+      // getting the user Details;
+      let userFilter = { number: userid };
+      let user = await userService.checkUserExist(userFilter);
+      const { companyName,  email } = user;
+
+      // sending us mail of enquiry
+      let tranporter = await nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: {
+          user: process.env.GMID,
+          pass: process.env.GPASS,
+        },
+      });
+
+      let info =  await tranporter.sendMail({
+        from: "info.myfac8ry@gmail.com",
+        to: email,
+        subject: " Myfac8ry enquiry ",
+        text: `AI is on work For You,${companyName} your quotation for ${enquiryNo} is on way pls be pateints `,
+        attachments: [
+          {
+            path: req.file.path,
+          },
+        ],
+      });
+      
+      console.log(info);
+
+      if (
+        (info.response =
+          "250 2.0.0 OK  1671384732 c12-20020a170903234c00b0017ec1b1bf9fsm5325160plh.217 - gsmtp")
+      ) {
+        let Obj = {
+          enquiryNo: enquiryNo,
+          companyName: companyName,
+        };
+        await userService.createEnquiry(Obj);
+
+        res.send({
+          success: 1,
+          message: "Enquiry created Succesfull !!",
+        });
+      }
+
+      fs.unlinkSync(req.file.path);
+    } catch (error) {
+      console.error(error);
+      res.send({
+        success: 0,
+        message: error.message,
+      });
+      fs.unlinkSync(req.file.path);
+    }
   },
 };
 

@@ -1,4 +1,5 @@
 const userModal = require("../modal/userModel")
+const enquiryModal = require("../modal/enquiryModel")
 
 const userService = {
     loginUser:async function (filter){
@@ -17,6 +18,7 @@ const userService = {
         
 
     },
+
     signup:async function (user){
         try {
             let newUser = new userModal(user)
@@ -26,15 +28,34 @@ const userService = {
             return success = 0
         }
     },
+
     checkUserExist :async function (filter){
         let data = {}
         try{
-            data = await userModal.findOne(filter)
+            data = await userModal
+              .findOne(filter)
+              .select()
+              .sort()
+              .skip()
+              .limit()
+              .read("secondaryPreferred")
+              .lean();
         }catch(e){
             console.log(e)
         }
         return data
 
+    },
+
+    createEnquiry : async function (obj){
+        let data = null
+        try {
+            data =  new enquiryModal(obj)
+            await data.save()
+        } catch (error) {
+            console.error(error)
+        }
+        return data
     }
 }
 
