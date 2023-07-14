@@ -135,6 +135,7 @@ const userController = {
           user: process.env.GMID,
           pass: process.env.GPASS,
         },
+        from: "info.myfac8ry@gmail.com",
       });
 
       let info =  await tranporter.sendMail({
@@ -149,7 +150,6 @@ const userController = {
         ],
       });
       
-      console.log(info);
 
       if (
         (info.response =
