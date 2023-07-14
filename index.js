@@ -3,8 +3,10 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv")
 const cors = require("cors")
 
-dotenv.config()
-const routes = require("./app/routes")
+dotenv.config({path:`.env.${process.env.NODE_ENV}`})
+const routes = require("./app/routes");
+
+
 
 const app = express();
 app.use(express.json());
@@ -21,7 +23,7 @@ mongoose
   )
   .then(() =>
     app.listen(port, () =>
-      console.log(`Server  is Running on Port: http://localhost:${port}`)
+      console.log(`Server env ${process.env.LINK} is Running on Port: http://localhost:${port}`)
     )
   )
   .catch((error) => console.log(`${error} did not connect`));
