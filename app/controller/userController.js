@@ -17,10 +17,17 @@ const userController = {
   },
 
   signupUser: async function (req, res) {
-    const { companyName, name, email, number, password } = req.body;
+    const { companyName, name, email, number, password,industryType } = req.body;
     let response = {};
     try {
-      if (!companyName || !name || !email || !number || !password) {
+      if (
+        !companyName ||
+        !name ||
+        !email ||
+        !number ||
+        !password ||
+        !industryType
+      ) {
         throw new Error("Please provide all details");
       }
 
@@ -46,6 +53,7 @@ const userController = {
         email: email,
         number: number,
         password: hashPassword,
+        industryType:industryType,
         createdAt: today,
       };
       let newUser = await userService.signup(user);
