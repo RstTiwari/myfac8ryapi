@@ -31,7 +31,7 @@ const userSchema = mongoose.Schema({
     select: false,
   },
   industryType :{
-    type:string
+    type:String
   }
 ,
   role: {
