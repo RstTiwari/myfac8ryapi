@@ -1,9 +1,10 @@
 const User = require("../modal/userModel");
 const userService = require("../services/userServices");
+const ProjectService = require("../services/projectService");
 const bycrypt = require("bcrypt");
-const nodemailer = require("nodemailer")
+const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
-const  fs  = require("fs");
+const fs = require("fs");
 const saltRounds = 10;
 
 const userController = {
@@ -17,7 +18,8 @@ const userController = {
   },
 
   signupUser: async function (req, res) {
-    const { companyName, name, email, number, password,industryType } = req.body;
+    const { companyName, name, email, number, password, industryType } =
+      req.body;
     let response = {};
     try {
       if (
@@ -53,7 +55,7 @@ const userController = {
         email: email,
         number: number,
         password: hashPassword,
-        industryType:industryType,
+        industryType: industryType,
         createdAt: today,
       };
       let newUser = await userService.signup(user);
@@ -115,7 +117,6 @@ const userController = {
 
   userEqnquiry: async function (req, res) {
     try {
-
       const { userid } = req.headers;
       Number(userid);
 
@@ -127,12 +128,12 @@ const userController = {
         throw new Error("please Provide valid useId");
       }
 
-      let enquiryNo = parseInt(Date.now()/1000)
+      let enquiryNo = parseInt(Date.now() / 1000);
 
       // getting the user Details;
       let userFilter = { number: userid };
       let user = await userService.checkUserExist(userFilter);
-      const { companyName,  email } = user;
+      const { companyName, email } = user;
 
       // sending us mail of enquiry
       let tranporter = await nodemailer.createTransport({
@@ -146,7 +147,7 @@ const userController = {
         from: "info.myfac8ry@gmail.com",
       });
 
-      let info =  await tranporter.sendMail({
+      let info = await tranporter.sendMail({
         from: "info.myfac8ry@gmail.com",
         to: email,
         subject: " Myfac8ry enquiry ",
@@ -157,7 +158,6 @@ const userController = {
           },
         ],
       });
-      
 
       if (
         (info.response =
@@ -185,6 +185,90 @@ const userController = {
       fs.unlinkSync(req.file.path);
     }
   },
+  getProjectList: async function (req, res) {
+    try {
+      const { projectType } = req.body;
+      if (!projectType) {
+        throw new Error("please provide valid Project Type");
+      }
+      let projectFilter = { projectType: projectType };
+      let projectData = await ProjectService.getProject(projectFilter);
+      if (projectData.length < 1) {
+        throw new Error("no projects Found");
+      }
+      let response = {
+        success: 1,
+        data: projectData,
+      };
+      res.send(response);
+    } catch (error) {
+      console.error(error);
+      let response = {
+        success: 0,
+        data: [],
+        message: error.message,
+      };
+      res.send(response);
+    }
+  },
+  addProject: async function (req, res) {
+    try {
+      const { projectType, title, description, price, images } = req.body;
+      if (!projectType || !title || !description || !price) {
+        throw new Error("please provide all Data");
+      }
+
+      let newObj = {
+        projectId: parseInt(Date.now() / 1000),
+        title: title,
+        description: description,
+        projectType: projectType,
+        price: price,
+        images: images,
+      };
+      let projectData = await ProjectService.addProject(newObj);
+      if (!projectData) {
+        throw new Error("failed to add Project");
+      }
+      let response = {
+        success: 1,
+        data: projectData,
+      };
+      res.send(response);
+    } catch (error) {
+      console.error(error);
+      let response = {
+        success: 0,
+        data: [],
+        message: error.message,
+      };
+      res.send(response);
+    }
+  },
+  getSingleProject:async function(req,res){
+    try {
+      const {projectId} = req.body;
+      let filter = {projectId:Number(projectId)}
+      let data = await ProjectService.getSingleProject(filter)
+      if(!data){
+        throw new Error("failed to find Project")
+      };
+
+      let response = {
+        success:1,
+        data:data
+      }
+      res.send(response)
+    } catch (error) {
+      console.error(error);
+      let response = {
+        success: 0,
+        data: [],
+        message:error.message
+      };
+      res.send(response);
+    }
+  }
 };
 
 module.exports = userController;
