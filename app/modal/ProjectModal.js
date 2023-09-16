@@ -6,6 +6,7 @@ const ProjectSchema = mongoose.Schema({
   description: { type: "String", required: true },
   images: [{ type: "String", required: true }],
   components: [{ type: "String", required: true }],
+  advantages: [{ type: "String", required: true }],
   price: { type: "Number", required: true },
   projectType: { type: "String", required: true },
 });

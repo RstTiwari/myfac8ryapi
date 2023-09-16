@@ -213,8 +213,16 @@ const userController = {
   },
   addProject: async function (req, res) {
     try {
-      const { projectType, title, description, price, images,components } = req.body;
-      if (!projectType || !title || !description || !price || !components) {
+      const {
+        projectType,
+        title,
+        description,
+        price,
+        images,
+        components,
+        advantages,
+      } = req.body;
+      if (!projectType || !title || !description || !price || !components || !advantages) {
         throw new Error("please provide all Data");
       }
 
@@ -225,7 +233,8 @@ const userController = {
         projectType: projectType,
         price: price,
         images: images,
-        components:components
+        components:components,
+        advantages:advantages
       };
       let projectData = await ProjectService.addProject(newObj);
       if (!projectData) {
