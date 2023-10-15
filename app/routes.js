@@ -9,6 +9,7 @@ const {
   getProjectList,
   addProject,
   getSingleProject,
+  bestSellingProject
 } = require("./controller/userController");
 
 const router = express.Router();
@@ -31,6 +32,7 @@ router.route("/enquiry").post(upload.single("enquiryFile"), userEqnquiry);
 router.route("/projectList").post(getProjectList);
 router.route("/addProject").post(addProject);
 router.route("/getSingleProject").post(getSingleProject);
+router.route("/bestsellingProject").post(bestSellingProject)
 
 
 

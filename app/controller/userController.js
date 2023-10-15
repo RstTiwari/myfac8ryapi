@@ -187,11 +187,16 @@ const userController = {
   },
   getProjectList: async function (req, res) {
     try {
-      const { projectType } = req.body;
+      const { projectType ,price} = req.body;
+      console.log(projectType,price)
       if (!projectType) {
         throw new Error("please provide valid Project Type");
       }
       let projectFilter = { projectType: projectType };
+      if(price){
+        projectFilter["price"]={"$lte":price}
+      }
+     console.log(projectFilter)
       let projectData = await ProjectService.getProject(projectFilter);
       if (projectData.length < 1) {
         throw new Error("no projects Found");
@@ -277,6 +282,21 @@ const userController = {
         message:error.message
       };
       res.send(response);
+    }
+  },
+
+  bestSellingProject:async function (req,res){
+    try {
+      let filter ={bestSelling:1}
+      let bestSellingData = await ProjectService.getProject(filter)
+      let response = {
+        success:1,
+        data:bestSellingData
+      }
+      res.send(response)
+    }catch{
+      console.error(error)
+
     }
   }
 };

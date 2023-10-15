@@ -9,6 +9,7 @@ const ProjectSchema = mongoose.Schema({
   advantages: [{ type: "String", required: true }],
   price: { type: "Number", required: true },
   projectType: { type: "String", required: true },
+  bestSelling:{type:"Number"}
 });
 
 module.exports = mongoose.model("projects",ProjectSchema)

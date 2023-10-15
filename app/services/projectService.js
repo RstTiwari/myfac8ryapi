@@ -12,7 +12,7 @@ const ProjectService = {
     return data;
   },
   getProject: async function (filter) {
-    let data = null;
+    let data = [];
     try {
       data = await ProjectModal.find(filter).limit().lean();
     } catch (error) {
